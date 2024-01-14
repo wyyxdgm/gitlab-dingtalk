@@ -9,8 +9,9 @@ COPY . .
 
 # 安装 PM2
 # 安装项目依赖
-RUN npm install -g pm2 &&\
-  npm install
+RUN npm config set registry https://registry.npmmirror.com && \
+  npm install -g pm2 cnpm && \
+  cnpm install
 
 # 对外暴露的端口号(根据你的实际情况修改)
 EXPOSE 6688
