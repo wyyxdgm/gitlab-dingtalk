@@ -11,42 +11,41 @@
 
 ### 自定义
 
-在 `templates` 下新建文件夹导出 `index.js`
+在 `templates` 下新建文件夹导出各消息对象，参考 [templates/README.md](./templates/README.md)
 
-格式：
+以`templates/default/index.js`为例，如下
 
 ```js
+/**
+ * text 类型
+ * text String 必填 文本内容
+ * isAtAll 选填 是否抄送所有人
+ */
+function text(text = "", isAtAll = false) {
+  return {
+    msgtype: "text",
+    text: {
+      content: text,
+    },
+    at: {
+      isAtAll: isAtAll,
+    },
+  };
+}
 
-  /**
-   * text 类型
-   * text String 必填 文本内容
-   * isAtAll 选填 是否抄送所有人
-   */
-  text(text = "", isAtAll = false) {
-    return {
-      msgtype: "text",
-      text: {
-        content: text,
-      },
-      at: {
-        isAtAll: isAtAll,
-      },
-    };
-  }
-
-  /**
-   * link类型
-   * text String 必填 文本内容
-   * title String 必填 消息标题
-   * picUrl String 必填 展示图片
-   * messageUrl String 必填 点击消息跳转的URL
-   */
-  link(linkObject) {
-    return {
-      msgtype: "link",
-      link: linkObject,
-    };
-  }
+/**
+ * link类型
+ * text String 必填 文本内容
+ * title String 必填 消息标题
+ * picUrl String 必填 展示图片
+ * messageUrl String 必填 点击消息跳转的URL
+ */
+function link(linkObject) {
+  return {
+    msgtype: "link",
+    link: linkObject,
+  };
+}
 module.exports = {
   _: (_) => text(`gitlab事件[${_.object_kind}]`), // default
   push: (_) =>
@@ -70,8 +69,6 @@ module.exports = {
   cocs: () => null, // 采用默认, 评论 code snippet 事件
 };
 ```
-
-### custom
 
 ## events
 
