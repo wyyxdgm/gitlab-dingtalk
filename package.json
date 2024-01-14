@@ -2,8 +2,10 @@
   "name": "gitlab-dingtalk",
   "version": "1.0.0",
   "description": "a gitlab dingtalk proxy server",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
+    "start": "pm2 start src/app.js",
+    "stop": "pm2 stop src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
