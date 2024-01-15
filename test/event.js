@@ -4,7 +4,7 @@ const event = "Tag Push Hook";
 const { HEADER_EVENTS_TO_KEY, PROP_TO_KEY } = require("../src/v.js");
 console.log(event);
 let fName = HEADER_EVENTS_TO_KEY[event];
-const templateName = process.env.TEMPLATE_NAME || "default";
+const templateName = process.env.TEMPLATE || "default";
 const template = require(`../src/templates/${templateName}`);
 const data = require("./events.js").tag;
 if (!fName) {

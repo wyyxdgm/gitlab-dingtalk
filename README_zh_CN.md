@@ -3,17 +3,82 @@
 [英文](./README.md)
 由于 GitLab 事件消息和钉钉的消息格式并不一致，因此无法直接推送。本项目作为中间服务来做消息转换，使得 GitLab 的事件可以推送到钉钉。
 
+## 快速开始
+
+### 准备
+
+1. 新建机器人，获取`access_token`，[参考文档](https://open.dingtalk.com/document/robots/custom-robot-access)
+2. 链接填写到 gitlab 的`web钩子`中 `http://${yourhost}:6688/webhook?access_token=${access_token}`
+
+tip: 支持多个机器人共有服务，就多个链接只需 access_token 区分：
+
+```bash
+http://${yourhost}:6688/webhook?access_token=${access_token1}
+http://${yourhost}:6688/webhook?access_token=${access_token2}
+```
+
+### Node
+
+用机器人的`access_token`替换如下代码中的 `${access_token}`
+
+```bash
+npm install -g pm2
+git clone git@github.com:wyyxdgm/gitlab-dingtalk.git
+cd gitlab-dingtalk && npm install
+ACCESS_TOKEN=${access_token} && \
+TEMPLATE=default && PORT=6688 && \
+npm start
+```
+
+### Docker
+
+用机器人的`access_token`替换如下代码中的 `${access_token}`
+
+```bash
+docker run -e ACCESS_TOKEN=${access_token} -e TEMPLATE=default -e PORT=6688 -p 6688:6688 -d wyyxdgm/gitlab-dingtalk
+```
+
+### Docker Compose
+
+创建`docker-compose.yml`如下：
+用机器人的`access_token`替换如下代码中的 `${access_token}`
+
+```yml
+version: "3"
+services:
+  app:
+    image: "wyyxdgm/gitlab-dingtalk"
+    container_name: gitlab-dingtalk
+    ports:
+      - "6688:6688"
+    environment:
+      - ACCESS_TOKEN=${access_token}
+      - PORT=6688
+      - TEMPLATE=default
+    command: ["npm", "start"]
+```
+
+执行
+
+```bash
+# 启动
+docker compose -f docker-compose.yml up -d
+# 关闭
+docker compose -f docker-compose.yml down
+```
+
 ## 消息模板
 
-### default
+### 默认模板
 
 默认支持
 
-### 自定义
+### 自定义模板
 
-在 `templates` 下新建文件夹导出各消息对象，参考 [templates/README.md](./templates/README.md)
+在 `templates` 下新建文件夹导出各消息对象，参考 [src/templates/README.md](./src/templates/README.md)
 
-以`templates/default/index.js`为例，如下
+以`default`模板为例：
+在文件`templates/default/index.js`，代码如下：
 
 ```js
 /**
@@ -53,7 +118,7 @@ module.exports = {
       text: _.commits.map((c) => c.message).join("\n"),
       title: `gitlab事件[${_.object_kind}] by ${_.user_name}`,
       picUrl: `${_.user_avatar}`,
-      messageUrl: `${_.repository.homepage}/commit/${checkout_sha}`,
+      messageUrl: `${_.repository.homepage}/commit/${_.checkout_sha}`,
     }), // Push 事件
   tag: () =>
     link({
@@ -70,7 +135,7 @@ module.exports = {
 };
 ```
 
-## events
+## 事件列表
 
 参考本地 gitlab `${host}/help/web_hooks/web_hooks`
 
@@ -81,31 +146,44 @@ module.exports = {
 - [评论 MR 事件](#comment-on-merge-request)
 - [评论 issue 事件](#comment-on-issue)
 - [评论 code snippet 事件](#comment-on-code-snippet)
+- [合并 事件](#merge-request-events)
 
 #### Push events
 
-- `X-Gitlab-Event: Push Hook`
+- header: `X-Gitlab-Event: Push Hook`
+- 默认 Link 模板
 
 #### Tag events
 
-- `X-Gitlab-Event: Tag Push Hook`
+- header: `X-Gitlab-Event: Tag Push Hook`
+- 默认 Link 模板
 
 #### Issues events
 
-- `X-Gitlab-Event: Issue Hook`
+- header: `X-Gitlab-Event: Issue Hook`
+- 默认 Text 模板
 
 #### Comment on commit
 
-- `X-Gitlab-Event: Note Hook`
+- header: `X-Gitlab-Event: Note Hook`
+- 默认 Text 模板
 
 #### Comment on merge request
 
-- `X-Gitlab-Event: Note Hook`
+- header: `X-Gitlab-Event: Note Hook`
+- 默认 Text 模板
 
 #### Comment on issue
 
-- `X-Gitlab-Event: Note Hook`
+- header: `X-Gitlab-Event: Note Hook`
+- 默认 Text 模板
 
 #### Comment on code snippet
 
-- `X-Gitlab-Event: Merge Request Hook`
+- header: `X-Gitlab-Event: Merge Request Hook`
+- 默认 Text 模板
+
+#### Merge request events
+
+- header: `X-Gitlab-Event: Merge Request Hook`
+- 默认 Link 模板

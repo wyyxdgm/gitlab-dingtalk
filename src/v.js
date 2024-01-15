@@ -23,7 +23,7 @@ module.exports.HEADER_EVENTS_TO_KEY = {
 // 用于判断req.body中是否有key，有key使用value对应方法
 module.exports.PROP_TO_KEY = {
   commit: "coc",
-  assignee: "comr",
+  merge_request: "comr",
   issue: "coi",
   snippet: "cocs",
 };

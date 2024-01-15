@@ -72,7 +72,7 @@ module.exports = {
       text: _.commits.map((c) => c.message).join("\n"),
       title: `gitlab事件[${_.object_kind}] by ${_.user_name}`,
       picUrl: `${_.user_avatar}`,
-      messageUrl: `${_.repository.homepage}/commit/${checkout_sha}`,
+      messageUrl: `${_.repository.homepage}/commit/${_.checkout_sha}`,
     }), // Push 事件
   tag: () =>
     link({

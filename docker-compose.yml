@@ -2,9 +2,12 @@ version: '3'
 services:
   app:
     image: 'wyyxdgm/gitlab-dingtalk'
+    restart: always
+    container_name: gitlab-dingtalk
     ports:
       - "6688:6688"
     environment:
+      - ACCESS_TOKEN=${access_token}
       - PORT=6688
       - TEMPLATE=default
     command: ["npm", "start"]

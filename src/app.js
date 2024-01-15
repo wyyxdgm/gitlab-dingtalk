@@ -3,11 +3,21 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const bodyParser = require("body-parser");
-const dingtalkRobot = require("dingtalk-robot-multi-platform");
+const DingtalkRobot = require("dingtalk-robot-multi-platform");
+const assert = require("assert");
+
+console.log("env:===========");
+console.log("ACCESS_TOKEN=", process.env.ACCESS_TOKEN || "");
+console.log("TEMPLATE=", process.env.TEMPLATE || "");
+console.log("PORT=", process.env.PORT || "");
+console.log("env:===========");
+
+let dingtalkRobot = null;
+if (process.env.ACCESS_TOKEN) dingtalkRobot = new DingtalkRobot(process.env.ACCESS_TOKEN);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// process.env.TEMPLATE_NAME
-const templateName = process.env.TEMPLATE_NAME || "default";
+// process.env.TEMPLATE
+const templateName = process.env.TEMPLATE || "default";
 const port = process.env.PORT || 6688;
 const template = require(`./templates/${templateName}`);
 const { HEADER_EVENTS_TO_KEY, PROP_TO_KEY } = require("./v");
@@ -30,10 +40,16 @@ app.post("/webhook", async (req, res) => {
   if (!fName) {
     return res.status(400).send("Bad Request");
   }
-  let msgOption = template[fName]?.(data) || template._?.(data);
+  let msgOption = (template[fName] && template[fName](data)) || (template._ && template._(data));
+  if (req.query.access_token) {
+    dingtalkRobot = new DingtalkRobot(req.query.access_token);
+  }
+  assert(dingtalkRobot, "access_token缺失");
+  console.log(`send start`, msgOption);
   await dingtalkRobot.send(msgOption);
+  console.log(`send success!`);
   // 返回成功
-  res.end("ok");
+  res.status(200).send({ success: true, msg: "ok" });
 });
 
 app.listen(port);
