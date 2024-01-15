@@ -1,6 +1,7 @@
 # gitlab-dingtalk
 
-[英文](./README.md)
+[English](./README.md)
+
 由于 GitLab 事件消息和钉钉的消息格式并不一致，因此无法直接推送。本项目作为中间服务来做消息转换，使得 GitLab 的事件可以推送到钉钉。
 
 ## 快速开始
@@ -10,12 +11,16 @@
 1. 新建机器人，获取`access_token`，[参考文档](https://open.dingtalk.com/document/robots/custom-robot-access)
 2. 链接填写到 gitlab 的`web钩子`中 `http://${yourhost}:6688/webhook?access_token=${access_token}`
 
-tip: 支持多个机器人共有服务，就多个链接只需 access_token 区分：
+提示: 本项目支持单机器人或多个机器人的模式，默认机器人可通过环境变量`ACCESS_TOKEN`设置，多机器人只需在链接上添加 `access_token` 参数进行区分
+链接如下：
 
 ```bash
-http://${yourhost}:6688/webhook?access_token=${access_token1}
-http://${yourhost}:6688/webhook?access_token=${access_token2}
+http://${yourhost}:6688/webhook # 默认机器人
+http://${yourhost}:6688/webhook?access_token=${access_token1} # access_token1机器人
+http://${yourhost}:6688/webhook?access_token=${access_token2} # access_token2机器人
 ```
+
+如果不存在环境变量`ACCESS_TOKEN`也不传递参数会报错
 
 ### Node
 
@@ -48,6 +53,7 @@ version: "3"
 services:
   app:
     image: "wyyxdgm/gitlab-dingtalk"
+    restart: always
     container_name: gitlab-dingtalk
     ports:
       - "6688:6688"

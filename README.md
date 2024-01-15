@@ -1,21 +1,25 @@
 # gitlab-dingtalk
 
-[Chinese](./README_zh_CN.md)
+[中文](./README_zh_CN.md)
+
 Due to the inconsistent message formats between GitLab event notifications and DingTalk, a direct push is not feasible. This project serves as an intermediary service for message translation, which enables the push of GitLab events to DingTalk.
 
 ## Quick Start
 
 ### Preparation
 
-1. Create a new robot and get the `access_token`, refer to the [documentation](https://open.dingtalk.com/document/robots/custom-robot-access)
-2. Fill in the link to the `webhook` in GitLab `http://${yourhost}:6688/webhook?access_token=${access_token}`
+1. Create a new robot and obtain `access_token`. Refer to this [document](https://open.dingtalk.com/document/robots/custom-robot-access)
+2. Insert this link into GitLab's `webhook`: `http://${yourhost}:6688/webhook?access_token=${access_token}`
 
-Tip: Multiple robots can share services, and different links only need to be distinguished by `access_token`:
+Note: This project supports both single robot and multiple robots mode. The default robot can be set by the environment variable `ACCESS_TOKEN`. For multiple robots, you only need to add the `access_token` parameter to the link for distinction. The links are as follows:
 
 ```bash
-http://${yourhost}:6688/webhook?access_token=${access_token1}
-http://${yourhost}:6688/webhook?access_token=${access_token2}
+http://${yourhost}:6688/webhook # default robot
+http://${yourhost}:6688/webhook?access_token=${access_token1} # robot with access_token1
+http://${yourhost}:6688/webhook?access_token=${access_token2} # robot with access_token2
 ```
+
+If the `ACCESS_TOKEN` environment variable does not exist and no parameter is passed, an error will be reported.
 
 ### Node
 
@@ -45,6 +49,7 @@ version: "3"
 services:
   app:
     image: "wyyxdgm/gitlab-dingtalk"
+    restart: always
     container_name: gitlab-dingtalk
     ports:
       - "6688:6688"
