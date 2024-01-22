@@ -77,14 +77,7 @@ docker compose -f docker-compose.yml down
 
 ### 默认模板
 
-默认支持
-
-### 自定义模板
-
-在 `templates` 下新建文件夹导出各消息对象，参考 [src/templates/README.md](./src/templates/README.md)
-
-以`default`模板为例：
-在文件`templates/default/index.js`，代码如下：
+默认模板文件在`src/templates/default/index.js`，可以直接根据[模板规范](./src/templates/README.md)修改，代码如下：
 
 ```js
 /**
@@ -141,9 +134,112 @@ module.exports = {
 };
 ```
 
+### 本地自定义模板
+
+1. 选择一个本地目录作为模板目录，比如`./default`
+2. 拷贝一份[src/templates/default/index.js](src/templates/default/index.js) 到 `./default/index.js`。
+3. 参考 [src/templates/README.md](./src/templates/README.md)调整`./default/index.js`内容
+4. 通过如下方式启动：
+
+- Docker
+
+替换其中 `./default` 为本地模板文件夹路径 以及 `${access_token}`后执行
+
+```bash
+docker run --privileged -e ACCESS_TOKEN=${access_token} \
+-e TEMPLATE=default -e PORT=6688 -p 6688:6688 \
+-v ./default:/opt/app/src/templates/default \
+-d wyyxdgm/gitlab-dingtalk
+```
+
+- Docker Compose
+
+新建`docker-compose.yml`，内容如下：
+
+```yml
+version: "3"
+services:
+  app:
+    image: "wyyxdgm/gitlab-dingtalk"
+    restart: always
+    container_name: gitlab-dingtalk
+    ports:
+      - "6688:6688"
+    environment:
+      - ACCESS_TOKEN=${access_token}
+      - PORT=6688
+      - TEMPLATE=default
+    volumes:
+      - ./default:/opt/app/src/templates/default
+    privileged: true
+    command: ["npm", "start"]
+```
+
+替换其中 `./default` 为本地模板文件夹路径 以及 `${access_token}`后执行
+
+```bash
+# 启动
+docker compose -f docker-compose.yml up -d
+```
+
+### 本地多模板切换
+
+新建`templates`文件夹，用于存放多个模板文件夹如下:
+
+```bash
+./templates
+├── default
+│   └── index.js
+├── template1
+│   └── index.js
+└── template2
+    └── index.js
+```
+
+- Docker
+
+替换其中 `${template_name}` 为本地模板子文件夹名称，以及 `${access_token}`后执行
+
+```bash
+docker run --privileged -e ACCESS_TOKEN=${access_token} \
+-e TEMPLATE=${template_name} -e PORT=6688 -p 6688:6688 \
+-v ./tempaltes:/opt/app/src/templates \
+-d wyyxdgm/gitlab-dingtalk
+```
+
+- Docker Compose
+
+`docker-compose.yml`内容如下：
+
+```yml
+version: "3"
+services:
+  app:
+    image: "wyyxdgm/gitlab-dingtalk"
+    restart: always
+    container_name: gitlab-dingtalk
+    ports:
+      - "6688:6688"
+    environment:
+      - ACCESS_TOKEN=${access_token}
+      - PORT=6688
+      - TEMPLATE=${template_name}
+    volumes:
+      - ./tempaltes:/opt/app/src/templates
+    privileged: true
+    command: ["npm", "start"]
+```
+
+替换`./tempaltes`为本地模板文件夹路径，替换模板名称`${template_name}`，以及 `${access_token}`后执行
+
+```bash
+# 启动
+docker compose -f docker-compose.yml up -d
+```
+
 ## 事件列表
 
-参考本地 gitlab `${host}/help/web_hooks/web_hooks`
+参考本地 gitlab `${host}/help/web_hooks/web_hooks`。详细事件的数据参考[EVENT.md](./src/templates/EVENT.md)
 
 - [Push 事件](#push-events)
 - [Tag 事件](#tag-events)

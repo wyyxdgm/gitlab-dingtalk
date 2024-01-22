@@ -73,12 +73,7 @@ docker compose -f docker-compose.yml down
 
 ### Default Template
 
-Default supported
-
-### Custom
-
-Create a new folder under `templates` and export each message object, refer to [src/templates/README.md](./src/templates/README.md)
-Take the default template as an example:In the file templates/default/index.js, the code is as follows:
+The default template file is at `src/templates/default/index.js`, you can directly modify it according to the [Template Standard](./src/templates/README.md). The code is as follows:
 
 ```js
 /**
@@ -135,9 +130,113 @@ module.exports = {
 };
 ```
 
+### Local Custom Template
+
+1. Choose a local directory as the template directory, for example `./default`
+2. Copy a version of [src/templates/default/index.js](src/templates/default/index.js) to `./default/index.js`.
+3. Refer to [src/templates/README.md](./src/templates/README.md) to adjust the content of `./default/index.js`
+
+4. Start it up using the following method:
+
+- Docker
+
+Replace `./default` with the path of the local template folder and `${access_token}`, then execute
+
+```bash
+docker run --privileged -e ACCESS_TOKEN=${access_token} \
+-e TEMPLATE=default -e PORT=6688 -p 6688:6688 \
+-v ./default:/opt/app/src/templates/default \
+-d wyyxdgm/gitlab-dingtalk
+```
+
+- Docker Compose
+
+Create a new file `docker-compose.yml`, the content is as follows:
+
+```yml
+version: "3"
+services:
+  app:
+    image: "wyyxdgm/gitlab-dingtalk"
+    restart: always
+    container_name: gitlab-dingtalk
+    ports:
+      - "6688:6688"
+    environment:
+      - ACCESS_TOKEN=${access_token}
+      - PORT=6688
+      - TEMPLATE=default
+    volumes:
+      - ./default:/opt/app/src/templates/default
+    privileged: true
+    command: ["npm", "start"]
+```
+
+Replace `./default` with your local template folder path and `${access_token}`, then execute.
+
+```bash
+# Start up
+docker compose -f docker-compose.yml up -d
+```
+
+### 本地多模板切换
+
+Create a new `templates` folder, for storing multiple template folders as follows:
+
+```bash
+./templates
+├── default
+│   └── index.js
+├── template1
+│   └── index.js
+└── template2
+    └── index.js
+```
+
+- Docker
+
+Replace `${template_name}` with the name of the local template subfolder, and `${access_token}`, then execute.
+
+```bash
+docker run --privileged -e ACCESS_TOKEN=${access_token} \
+-e TEMPLATE=${template_name} -e PORT=6688 -p 6688:6688 \
+-v ./tempaltes:/opt/app/src/templates \
+-d wyyxdgm/gitlab-dingtalk
+```
+
+- Docker Compose
+
+The content of `docker-compose.yml` is as follows:
+
+```yml
+version: "3"
+services:
+  app:
+    image: "wyyxdgm/gitlab-dingtalk"
+    restart: always
+    container_name: gitlab-dingtalk
+    ports:
+      - "6688:6688"
+    environment:
+      - ACCESS_TOKEN=${access_token}
+      - PORT=6688
+      - TEMPLATE=${template_name}
+    volumes:
+      - ./tempaltes:/opt/app/src/templates
+    privileged: true
+    command: ["npm", "start"]
+```
+
+Replace `./templates` with your local templates folder path, replace the template name `${template_name}`, and `${access_token}`, then execute.
+
+```bash
+# Start up
+docker compose -f docker-compose.yml up -d
+```
+
 ## Event List
 
-Refer to local gitlab `${host}/help/web_hooks/web_hooks`
+Refer to local gitlab `${host}/help/web_hooks/web_hooks`, For more detail events data, please refer to[EVENT.md](./src/templates/EVENT.md)
 
 - [Push events](#push-events)
 - [Tag events](#tag-events)
