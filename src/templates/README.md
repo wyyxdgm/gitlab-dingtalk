@@ -1,6 +1,7 @@
 # Template
 
 [中文](./README_zh_CN.md)
+
 Each template needs to export the following data objects
 
 ```ts
@@ -94,5 +95,4 @@ module.exports = {
       messageUrl: `${_.repository.homepage}/merge_requests/${_.object_attributes.id}`,
     }), // Adopt default, Merge Request event
 };
-f;
 ```

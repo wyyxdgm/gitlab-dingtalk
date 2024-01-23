@@ -179,7 +179,7 @@ Replace `./default` with your local template folder path and `${access_token}`, 
 docker compose -f docker-compose.yml up -d
 ```
 
-### 本地多模板切换
+### Multiple Local Templates
 
 Create a new `templates` folder, for storing multiple template folders as follows:
 
